@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>测试集</title>
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+
+<body>
+  <h3>Hybrid Web Test</h3>
+  <p>点击下方按钮测试各种事件：</p>
+
+  <button onclick="NativeTest.onJsPrompt()">onJsPromot</button>
+  <button onclick="NativeTest.shouldOverrideUrlLoading()">shouldOverrideLoading</button>
+  <button onclick="NativeTest.sendDataToNative()">addJavaScriptInterface</button>
+  <button onclick="NativeTest.testIframe()">iframe</button>
+  <li>点击左上角的返回按钮测试Native事件</li>
+</body>
+<style>
+    body {
+        padding:16px;
+    }
+    button {
+    display:block;
+        margin-bottom:20px;
+    }
+</style>
+<script>
+  var NativeTest = {
+    onJsPrompt: function() {
+        var data = prompt("native://getUserInfo?id=1");
+        console.log('data:' + data);
+    },
+    shouldOverrideUrlLoading: function() {
+        document.location="native://getUserInfo?id=1";
+    },
+    sendDataToNative: function() {
+        HybridAPI.sendToNative('Hello');
+    },
+    testIframe: function() {
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.documentElement.appendChild(iframe);
+        iframe.src="native://getUserInfo?id=1";
+        /*删除iframe*/
+
+    },
+  }
+  HybridAPI.sendToJavaScript = function() {
+        console.log('send from native');
+    }
+</script>
+
+</html>
