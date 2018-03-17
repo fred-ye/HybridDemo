@@ -59,8 +59,17 @@
 
     },
   }
-  HybridAPI.sendToJavaScript = function() {
+  HybridAPI.sendToJavaScript = function(data) {
         console.log('send from native');
+        var obj = JSON.parse(data);
+        var params = {
+            id: obj.id,
+            data: {
+                handled: true,
+            }
+        }
+        console.log(JSON.stringify(params));
+        HybridAPI.sendToNative(JSON.stringify(params));
     }
 </script>
 

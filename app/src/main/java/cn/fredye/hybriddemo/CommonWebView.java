@@ -3,11 +3,13 @@ package cn.fredye.hybriddemo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 
 import com.google.gson.Gson;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +23,10 @@ public class CommonWebView extends WebView{
     public final String TO_JAVASCRIPT_PREFIX = "javascript:HybridAPI.sendToJavaScript('%s')";
 
     public HybridAPI hybridAPI;
+    private int callbackId = 0;
+
+    public Map<String, INativeCallback> callbackMap = new HashMap<>();
+
 
     @SuppressLint("JavascriptInterface")
     public CommonWebView(Context context, AttributeSet attrs) {
@@ -28,10 +34,23 @@ public class CommonWebView extends WebView{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             this.setWebContentsDebuggingEnabled(true);
         }
-        hybridAPI = new HybridAPI();
+        hybridAPI = new HybridAPI(context, this);
         this.addJavascriptInterface(hybridAPI, "HybridAPI");
     }
 
+
+    public void callJs(Map<String, Object>map, INativeCallback callback) {
+        Map<String, Object> message = new HashMap<String, Object>();
+        if (map != null) {
+            message.put("params", map);
+        }
+        if (callback != null) {
+            String callbackId = "Hybrid_CB_" + (++ this.callbackId);
+            callbackMap.put(callbackId, callback);
+            message.put("id", callbackId);
+        }
+        sendToJavaScript(message);
+    }
 
     public void sendToJavaScript(Map<String, Object> message) {
         String str = new Gson().toJson(message);
@@ -42,8 +61,8 @@ public class CommonWebView extends WebView{
         } else {
             loadUrl(jsCommand);
         }
-
     }
+
     private String escapeString(String javascript) {
         String result;
         result = javascript.replace("\\", "\\\\");
